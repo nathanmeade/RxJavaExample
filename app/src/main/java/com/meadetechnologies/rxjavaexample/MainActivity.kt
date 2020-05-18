@@ -8,7 +8,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.schedulers.Schedulers
 
@@ -16,6 +18,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class MainActivity : AppCompatActivity() {
 
     val TAG = "RxJavaDebugLog"
+
+    val disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +47,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSubscribe(d: Disposable?) {
                 Log.d(TAG, "onSubscribe called")
+                disposables.add(d)
             }
 
             override fun onNext(t: Task?) {
@@ -58,7 +63,11 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        val flowable = taskObservable.toFlowable(BackpressureStrategy.BUFFER)
+        disposables.add(taskObservable.subscribe(object : Consumer<Task>{
+            override fun accept(t: Task?) {
+
+            }
+        }))
     }
 
     private fun createTasksList() : List<Task>{
@@ -69,5 +78,10 @@ class MainActivity : AppCompatActivity() {
         tasks.add(Task("Unload the dishwasher", false, 0))
         tasks.add(Task("Make dinner", true, 5))
         return tasks
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposables.clear()
     }
 }
