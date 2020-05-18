@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.meadetechnologies.rxjavaexample.models.Task
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
@@ -22,19 +23,18 @@ class MainActivity : AppCompatActivity() {
 
         val taskObservable = Observable.fromIterable(createTasksList())
                 .subscribeOn(Schedulers.io())
-                .filter(object : Predicate<Task>{
-                    override fun test(t: Task?): Boolean {
-                        Log.d(TAG, "test: ${Thread.currentThread().name}")
-                        try {
-                            Thread.sleep(1000)
-                        } catch (e: InterruptedException){
-                            e.printStackTrace()
-                        }
-                            return t?.isComplete!!
+                .filter { t ->
+                    Log.d(TAG, "test: ${Thread.currentThread().name}")
+                    try {
+                        Thread.sleep(1000)
+                    } catch (e: InterruptedException){
+                        e.printStackTrace()
                     }
-
-                })
+                    t?.isComplete!!
+                }
                 .observeOn(AndroidSchedulers.mainThread())
+
+
 
         taskObservable.subscribe(object : Observer<Task> {
             override fun onComplete() {
@@ -57,9 +57,11 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
+        val flowable = taskObservable.toFlowable(BackpressureStrategy.BUFFER)
     }
 
-    fun createTasksList() : List<Task>{
+    private fun createTasksList() : List<Task>{
         val tasks = ArrayList<Task>()
         tasks.add(Task("Take out the trash", true, 3))
         tasks.add(Task("Walk the dog", false, 2))
