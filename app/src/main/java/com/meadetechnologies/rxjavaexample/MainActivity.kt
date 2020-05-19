@@ -3,17 +3,13 @@ package com.meadetechnologies.rxjavaexample
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.meadetechnologies.rxjavaexample.models.Task
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.functions.Predicate
+import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.schedulers.Schedulers
-import okhttp3.ResponseBody
-import java.io.IOException
-import java.util.concurrent.ExecutionException
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,16 +22,16 @@ class MainActivity : AppCompatActivity() {
 
         val taskObservable = Observable
             .fromIterable(createTasksList())
-            .filter(object : Predicate<Task>{
-                override fun test(t: Task?): Boolean {
-                    return t!!.isComplete
+            .distinct(object : Function<Task, String>{
+                override fun apply(t: Task?): String {
+                    return t!!.description
                 }
 
             })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
-        taskObservable.subscribe(object : Observer<Task>{
+        taskObservable.subscribe(object : Observer<Task> {
             override fun onComplete() {
 
             }
@@ -60,8 +56,10 @@ class MainActivity : AppCompatActivity() {
         tasks.add(Task("Take out the trash", true, 3))
         tasks.add(Task("Walk the dog", false, 2))
         tasks.add(Task("Make my bed", true, 1))
+        tasks.add(Task("Make dinner", true, 5))
         tasks.add(Task("Unload the dishwasher", false, 0))
         tasks.add(Task("Make dinner", true, 5))
+        tasks.add(Task("Make dinner2", true, 5))
         return tasks
     }
 }
