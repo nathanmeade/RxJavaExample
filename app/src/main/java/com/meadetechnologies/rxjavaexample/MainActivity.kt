@@ -21,22 +21,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /*val task = Task("Walk the dog", false, 3)*/
+        val task = Task("Walk the dog", false, 3)
 
         val taskObservable = Observable
-                .create(object : ObservableOnSubscribe<Task>{
-                    override fun subscribe(emitter: ObservableEmitter<Task>?) {
-                        for (task in createTasksList()){
-                            if (!emitter!!.isDisposed){
-                                emitter.onNext(task)
-                            }
-                        }
-                        if (!emitter!!.isDisposed){
-                            emitter.onComplete()
-                        }
-                    }
-
-                })
+                .just(task)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
