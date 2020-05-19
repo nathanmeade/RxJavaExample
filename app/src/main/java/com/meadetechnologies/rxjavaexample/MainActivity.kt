@@ -24,11 +24,12 @@ class MainActivity : AppCompatActivity() {
         val task = Task("Walk the dog", false, 3)
 
         val taskObservable = Observable
-                .just(task)
+                .range(0, 9)
                 .subscribeOn(Schedulers.io())
+                .repeat(2)
                 .observeOn(AndroidSchedulers.mainThread())
 
-        taskObservable.subscribe(object : Observer<Task>{
+        taskObservable.subscribe(object : Observer<Int>{
             override fun onComplete() {
 
             }
@@ -37,8 +38,8 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            override fun onNext(t: Task?) {
-                Log.d(TAG, "onNext: " + t!!.description)
+            override fun onNext(t: Int?) {
+                Log.d(TAG, "onNext: $t")
             }
 
             override fun onError(e: Throwable?) {
