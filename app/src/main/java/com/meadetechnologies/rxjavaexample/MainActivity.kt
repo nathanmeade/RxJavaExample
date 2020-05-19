@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,12 +25,18 @@ class MainActivity : AppCompatActivity() {
         val task = Task("Walk the dog", false, 3)
 
         val taskObservable = Observable
-                .range(0, 9)
+                .interval(1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
-                .repeat(2)
+                .takeWhile(object : Predicate<Long>{
+                    override fun test(t: Long?): Boolean {
+                        Log.d(TAG, "Long: $t thread: ${Thread.currentThread().name}")
+                        return t!! <= 5
+                    }
+
+                })
                 .observeOn(AndroidSchedulers.mainThread())
 
-        taskObservable.subscribe(object : Observer<Int>{
+        taskObservable.subscribe(object : Observer<Long>{
             override fun onComplete() {
 
             }
@@ -38,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            override fun onNext(t: Int?) {
+            override fun onNext(t: Long?) {
                 Log.d(TAG, "onNext: $t")
             }
 
