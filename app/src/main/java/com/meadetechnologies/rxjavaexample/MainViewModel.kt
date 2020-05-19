@@ -1,6 +1,8 @@
 package com.meadetechnologies.rxjavaexample
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.ResponseBody
 import java.util.concurrent.Future
@@ -14,7 +16,7 @@ class MainViewModel : ViewModel {
         repository = Repository.getinstance()
     }
 
-    fun makeFutureQuery(): Future<Observable<ResponseBody>> {
-        return repository.makeFutureQuery()
+    fun makeQuery(): LiveData<ResponseBody> {
+        return repository.makeReactiveQuery()
     }
 }

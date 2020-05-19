@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.meadetechnologies.rxjavaexample.models.Task
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.ResponseBody
@@ -47,38 +46,18 @@ class MainActivity : AppCompatActivity() {
         })*/
 
         val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        try {
-            mainViewModel.makeFutureQuery().get()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<ResponseBody>{
-                    override fun onComplete() {
-                        Log.d(TAG, "onComplete: called.")
-                    }
-
-                    override fun onSubscribe(d: Disposable?) {
-                        Log.d(TAG, "onSubscribe: called.")
-                    }
-
-                    override fun onNext(t: ResponseBody?) {
-                        Log.d(TAG, "onNext: got the response from server!")
+            mainViewModel.makeQuery()
+                .observe(this, object : androidx.lifecycle.Observer<ResponseBody>{
+                    override fun onChanged(t: ResponseBody?) {
+                        Log.d(TAG, "onChanged: this is a live data response")
                         try {
-                            Log.d(TAG, "onNext: " + t!!.string())
+                            Log.d(TAG, "onChanged: ${t!!.string()}")
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
                     }
 
-                    override fun onError(e: Throwable?) {
-                        Log.e(TAG, "onError: ", e)
-                    }
-
                 })
-        } catch (e : ExecutionException) {
-            e.printStackTrace()
-        } catch (e : InterruptedException) {
-            e.printStackTrace()
-        }
     }
 
     private fun createTasksList() : List<Task>{

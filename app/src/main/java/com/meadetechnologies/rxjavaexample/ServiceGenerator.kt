@@ -7,18 +7,22 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class ServiceGenerator {
 
-    val BASE_URL = "https://jsonplaceholder.typicode.com/"
+    companion object {
+        val BASE_URL = "https://jsonplaceholder.typicode.com/"
 
-    val retrofitBuilder = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
+        val retrofitBuilder = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
 
-    val retrofit = retrofitBuilder.build()
+        val retrofit = retrofitBuilder.build()
 
-    val requestApi = retrofit.create(RequestApi::class.java)
+        val requestApi = retrofit.create(RequestApi::class.java)
 
-    fun getrequestApi(): RequestApi {
-        return requestApi
+        fun getrequestApi(): RequestApi {
+            return requestApi
+        }
     }
+
+
 }

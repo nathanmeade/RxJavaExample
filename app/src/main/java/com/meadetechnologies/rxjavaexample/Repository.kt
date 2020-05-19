@@ -1,6 +1,9 @@
 package com.meadetechnologies.rxjavaexample
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataReactiveStreams
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.ResponseBody
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
@@ -22,40 +25,9 @@ class Repository {
         }
     }
 
-    fun makeFutureQuery() : Future<Observable<ResponseBody>> {
-        val executor = Executors.newSingleThreadExecutor()
-        val myNetworkCallable = object : Callable<Observable<ResponseBody>> {
-            override fun call(): Observable<ResponseBody> {
-                return ServiceGenerator().getrequestApi().makeObservableQuery()
-            }
-
-        }
-
-        val futureObservable = object : Future<Observable<ResponseBody>>{
-            override fun isDone(): Boolean {
-                return executor.isTerminated
-            }
-
-            override fun get(): Observable<ResponseBody> {
-                return executor.submit(myNetworkCallable).get()
-            }
-
-            override fun get(timeout: Long, unit: TimeUnit?): Observable<ResponseBody> {
-                return executor.submit(myNetworkCallable).get(timeout, unit)
-            }
-
-            override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
-                if (mayInterruptIfRunning){
-                    executor.shutdown()
-                }
-                return false
-            }
-
-            override fun isCancelled(): Boolean {
-                return executor.isShutdown
-            }
-
-        }
-        return futureObservable
+    fun makeReactiveQuery() : LiveData<ResponseBody>{
+        return LiveDataReactiveStreams.fromPublisher(ServiceGenerator.getrequestApi()
+            .makeQuery()
+            .subscribeOn(Schedulers.io()))
     }
 }
