@@ -20,11 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val taskObservable = Observable
-                .fromArray(Task("Take out the trash", true, 3),
-                    Task("Walk the dog", false, 2),
-                    Task("Make my bed", true, 1),
-                    Task("Unload the dishwasher", false, 0),
-                    Task("Make dinner", true, 5))
+                .fromIterable(createTasksList())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
