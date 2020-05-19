@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             .fromIterable(createTasksList())
             .filter(object : Predicate<Task>{
                 override fun test(t: Task?): Boolean {
-                    return t!!.description.equals("Walk the dog")
+                    return t!!.isComplete
                 }
 
             })
