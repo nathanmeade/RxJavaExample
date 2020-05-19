@@ -32,27 +32,30 @@ class MainActivity : AppCompatActivity() {
         val taskObservable = Observable
             .fromIterable(createTasksList())
             .subscribeOn(Schedulers.io())
-            .map(extractDescriptionFunction)
+
+                taskObservable.buffer(2)
             .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<List<Task>>{
+                override fun onComplete() {
 
-        taskObservable.subscribe(object : Observer<String>{
-            override fun onComplete() {
+                }
 
-            }
+                override fun onSubscribe(d: Disposable?) {
 
-            override fun onSubscribe(d: Disposable?) {
+                }
 
-            }
+                override fun onNext(t: List<Task>?) {
+                    Log.d(TAG, "Start of list/buffer. ----------")
+                    for (task in t!!) {
+                        Log.d(TAG, "description: ${task.description}")
+                    }
+                }
 
-            override fun onNext(t: String?) {
-                Log.d(TAG, "onNext: description: $t")
-            }
+                override fun onError(e: Throwable?) {
 
-            override fun onError(e: Throwable?) {
+                }
 
-            }
-
-        })
+            })
     }
 
     private fun createTasksList() : List<Task>{
