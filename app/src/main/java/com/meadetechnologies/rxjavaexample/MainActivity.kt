@@ -25,15 +25,8 @@ class MainActivity : AppCompatActivity() {
         val task = Task("Walk the dog", false, 3)
 
         val taskObservable = Observable
-                .interval(1, TimeUnit.SECONDS)
+                .timer(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
-                .takeWhile(object : Predicate<Long>{
-                    override fun test(t: Long?): Boolean {
-                        Log.d(TAG, "Long: $t thread: ${Thread.currentThread().name}")
-                        return t!! <= 5
-                    }
-
-                })
                 .observeOn(AndroidSchedulers.mainThread())
 
         taskObservable.subscribe(object : Observer<Long>{
