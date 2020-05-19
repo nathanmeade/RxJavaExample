@@ -21,18 +21,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val extractDescriptionFunction = object : Function<Task, String>{
+            override fun apply(t: Task?): String {
+                Log.d(TAG, "Current thread: ${Thread.currentThread().name}")
+                return t!!.description
+            }
+
+        }
+
         val taskObservable = Observable
             .fromIterable(createTasksList())
-            .takeWhile(object : Predicate<Task>{
-                override fun test(t: Task?): Boolean {
-                    return t!!.isComplete
-                }
-
-            })
             .subscribeOn(Schedulers.io())
+            .map(extractDescriptionFunction)
             .observeOn(AndroidSchedulers.mainThread())
 
-        taskObservable.subscribe(object : Observer<Task> {
+        taskObservable.subscribe(object : Observer<String>{
             override fun onComplete() {
 
             }
@@ -41,8 +44,8 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            override fun onNext(t: Task?) {
-                Log.d(TAG, "onNext: This task matches the description: " + t!!.description)
+            override fun onNext(t: String?) {
+                Log.d(TAG, "onNext: description: $t")
             }
 
             override fun onError(e: Throwable?) {
