@@ -5,13 +5,10 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.meadetechnologies.rxjavaexample.models.Task
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.*
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.functions.Consumer
-import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,14 +19,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val task = Task("Walk the dog", false, 3)
-
         val taskObservable = Observable
-                .timer(3, TimeUnit.SECONDS)
+                .fromArray(Task("Take out the trash", true, 3),
+                    Task("Walk the dog", false, 2),
+                    Task("Make my bed", true, 1),
+                    Task("Unload the dishwasher", false, 0),
+                    Task("Make dinner", true, 5))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
-        taskObservable.subscribe(object : Observer<Long>{
+        taskObservable.subscribe(object : Observer<Task>{
             override fun onComplete() {
 
             }
@@ -38,8 +37,8 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            override fun onNext(t: Long?) {
-                Log.d(TAG, "onNext: $t")
+            override fun onNext(t: Task?) {
+                Log.d(TAG, "onNext: : " + t!!.description)
             }
 
             override fun onError(e: Throwable?) {
@@ -59,3 +58,4 @@ class MainActivity : AppCompatActivity() {
         return tasks
     }
 }
+
