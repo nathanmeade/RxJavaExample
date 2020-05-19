@@ -22,12 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         val taskObservable = Observable
             .fromIterable(createTasksList())
-            .distinct(object : Function<Task, String>{
-                override fun apply(t: Task?): String {
-                    return t!!.description
-                }
-
-            })
+            .take(3)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
