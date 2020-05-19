@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Function
+import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 
@@ -22,7 +23,12 @@ class MainActivity : AppCompatActivity() {
 
         val taskObservable = Observable
             .fromIterable(createTasksList())
-            .take(3)
+            .takeWhile(object : Predicate<Task>{
+                override fun test(t: Task?): Boolean {
+                    return t!!.isComplete
+                }
+
+            })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
@@ -49,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     private fun createTasksList() : List<Task>{
         val tasks = ArrayList<Task>()
         tasks.add(Task("Take out the trash", true, 3))
-        tasks.add(Task("Walk the dog", false, 2))
+        tasks.add(Task("Walk the dog", true, 2))
         tasks.add(Task("Make my bed", true, 1))
         tasks.add(Task("Make dinner", true, 5))
         tasks.add(Task("Unload the dishwasher", false, 0))
